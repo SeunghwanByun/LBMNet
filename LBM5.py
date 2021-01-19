@@ -325,15 +325,13 @@ class LBMNet50(nn.Module):
 # Feed-forward LBM feature version
 class LBMNet50_Improv(nn.Module):
     def __init__(self, layers=50, input_channels=6, classes=1, conv=default_conv, criterion=nn.BCEWithLogitsLoss()):
-        super(LBMNet50_Improve, self).__init__()
+        super(LBMNet50_Improv, self).__init__()
 
         self.criterion = criterion
         self.classes = classes
 
         if layers == 50:
-            # model = resnet50_888()
-            # model = resnet50_81616()
-            model = resnet50_8816()
+            model = resnet50()
         elif layers == 101:
             model = resnet101()
 
@@ -355,11 +353,11 @@ class LBMNet50_Improv(nn.Module):
         self.lbm4 = LBM_SUM(input_channels=32)
 
         self.conv_32 = nn.Sequential(nn.ConvTranspose2d(2048, 1024, kernel_size=4, stride=2, padding=1),
-                                     #nn.Conv2d(2048, 1024, kernel_size=3, stride=1, padding=1),
+            # nn.Conv2d(4096, 1024, kernel_size=3, stride=1, padding=1),
                                      nn.BatchNorm2d(1024),
                                      nn.ReLU(inplace=True))
-        self.conv_16 = nn.Sequential(#nn.ConvTranspose2d(2048, 512, kernel_size=4, stride=2, padding=1),
-                                     nn.Conv2d(2048, 512, kernel_size=3, stride=1, padding=1),
+        self.conv_16 = nn.Sequential(nn.ConvTranspose2d(2048, 512, kernel_size=4, stride=2, padding=1),
+            # nn.Conv2d(3072, 512, kernel_size=3, stride=1, padding=1),
                                      nn.BatchNorm2d(512),
                                      nn.ReLU(inplace=True))
         self.conv_8 = nn.Sequential(nn.ConvTranspose2d(1024, 256, kernel_size=4, stride=2, padding=1),
@@ -369,7 +367,8 @@ class LBMNet50_Improv(nn.Module):
                                     nn.BatchNorm2d(64),
                                     nn.ReLU(inplace=True))
         self.conv_2 = nn.Sequential(Upsampler(conv, 2, 128, act=False),
-                                    nn.ConvTranspose2d(128, 32, kernel_size=4, stride=2, padding=1),
+                                    nn.ConvTranspose2d(128, 32
+                                                       , kernel_size=4, stride=2, padding=1),
                                     nn.BatchNorm2d(32),
                                     nn.ReLU(inplace=True))
 
@@ -396,31 +395,13 @@ class LBMNet50_Improv(nn.Module):
         lbm8 = self.lbm1(x8)
         x8_lbm8 = x8 * lbm8
 
-        x16 = self.layer3(x8_lbm8) # x 1/8, 1024
+        x16 = self.layer3(x8_lbm8) # x 1/16, 1024
         lbm16 = self.lbm0(x16)
         x16_lbm16 = x16 * lbm16
 
-        x32 = self.layer4(x16_lbm16) # x 1/8, 2048
+        x32 = self.layer4(x16_lbm16) # x 1/32, 2048
         lbm32 = self.lbm(x32)
         x32_lbm32 = x32 * lbm32
-
-        # cv2.imshow("lbm32",
-        #            (255.0 * lbm32.detach().cpu().numpy()[0].transpose(1, 2, 0).reshape(2, 16, 1).astype(np.uint8)))
-        #
-        # cv2.imshow("lbm16",
-        #            (255.0 * lbm16.detach().cpu().numpy()[0].transpose(1, 2, 0).reshape(4, 32, 1).astype(np.uint8)))
-        #
-        # cv2.imshow("lbm8",
-        #            (255.0 * lbm8.detach().cpu().numpy()[0].transpose(1, 2, 0).reshape(8, 64, 1).astype(np.uint8)))
-        #
-        # cv2.imshow("lbm4",
-        #            (255.0 * lbm4.detach().cpu().numpy()[0].transpose(1, 2, 0).reshape(16, 128, 1).astype(np.uint8)))
-        #
-        # cv2.imshow("lbm2",
-        #            (255.0 * lbm2.detach().cpu().numpy()[0].transpose(1, 2, 0).reshape(16, 128, 1).astype(np.uint8)))
-        #
-        # cv2.imshow("lbm1",
-        #            (255.0 * lbm1.detach().cpu().numpy()[0].transpose(1, 2, 0).reshape(64, 512, 1).astype(np.uint8)))
 
         x32 = self.conv_32(x32_lbm32)
 
@@ -440,155 +421,8 @@ class LBMNet50_Improv(nn.Module):
         x_output = self.output(x1)
 
         x_output = torch.sigmoid(x_output)
-        # cv2.imshow("ResNeSt X", (255.0 * x_output.detach().cpu().numpy()[0].transpose(1, 2, 0)).astype(np.uint8))
 
         if self.training:
-            # Drwaing
-            # cv2.waitKey(30)
-
-            # x_output = x_output[:, :2]
-            # y = y[:, :2]
-            loss = self.criterion(x_output, y)
-
-            return x_output, loss
-        else:
-            return x_output
-
-class LBMNet50_Test54(nn.Module):
-    def __init__(self, layers=50, input_channels=8, classes=1, conv=default_conv, criterion=nn.BCEWithLogitsLoss()):
-        super(LBMNet50_Test54, self).__init__()
-
-        self.criterion = criterion
-        self.classes = classes
-
-        if layers == 50:
-            model = resnet50()
-        elif layers == 101:
-            model = resnet101()
-
-        self.header = nn.Sequential(CoordConv(input_channels, 32, with_r=True),
-                                    nn.BatchNorm2d(32),
-                                    nn.ReLU(inplace=True))
-        self.stage1 = nn.Sequential(model.conv1, model.bn1, model.relu, model.maxpool)
-        self.stage2 = model.layer1
-        self.stage3 = model.layer2
-        self.stage4 = model.layer3
-        self.stage5 = model.layer4
-        self.avgpool = model.avgpool
-
-        self.lbm = LBM_SUM(input_channels=2048)
-        self.lbm0 = LBM_SUM(input_channels=1024)
-        self.lbm1 = LBM_SUM(input_channels=512)
-        self.lbm2 = LBM_SUM(input_channels=256)
-        self.lbm3 = LBM_SUM(input_channels=64)
-        self.lbm4 = LBM_SUM(input_channels=32)
-
-        # self.atrousConv1 = nn.Conv2d(1024, 1024, kernel_size=3, stride=1, padding=3, dilation=3, bias=False)
-        # self.atrousConv2 = nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=6, dilation=6, bias=False)
-        # self.atrousConv3 = nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=6, dilation=6, bias=False)
-        # self.atrousConv4 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=9, dilation=9, bias=False)
-        # self.atrousConv5 = nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=12, dilation=12, bias=False)
-
-        self.conv_32 = nn.Sequential(#nn.Conv2d(2048, 2048, kernel_size=1, stride=1, padding=0),
-                                     nn.ConvTranspose2d(2048, 1024, kernel_size=4, stride=2, padding=1),
-            # nn.Conv2d(4096, 1024, kernel_size=3, stride=1, padding=1),
-                                     nn.BatchNorm2d(1024),
-                                     nn.ReLU(inplace=True))
-        self.conv_16 = nn.Sequential(#nn.Conv2d(2048, 2048, kernel_size=1, stride=1, padding=0),
-                                     nn.ConvTranspose2d(2048, 512, kernel_size=4, stride=2, padding=1),
-            # nn.Conv2d(3072, 512, kernel_size=3, stride=1, padding=1),
-                                     nn.BatchNorm2d(512),
-                                     nn.ReLU(inplace=True))
-        self.conv_8 = nn.Sequential(#nn.Conv2d(1024, 1024, kernel_size=1, stride=1, padding=0),
-                                    nn.ConvTranspose2d(1024, 256, kernel_size=4, stride=2, padding=1),
-                                    nn.BatchNorm2d(256),
-                                    nn.ReLU(inplace=True))
-        self.conv_4 = nn.Sequential(#nn.Conv2d(512, 512, kernel_size=1, stride=1, padding=0),
-                                    nn.Conv2d(512, 64, kernel_size=3, stride=1, padding=1),
-                                    nn.BatchNorm2d(64),
-                                    nn.ReLU(inplace=True))
-        self.conv_2 = nn.Sequential(#nn.Conv2d(128, 128, kernel_size=1, stride=1, padding=0),
-                                    Upsampler(conv, 2, 128, act=False),
-                                    nn.ConvTranspose2d(128, 32, kernel_size=4, stride=2, padding=1),
-                                    nn.BatchNorm2d(32),
-                                    nn.ReLU(inplace=True))
-
-        self.output = nn.Sequential(#nn.Conv2d(64, 64, kernel_size=1, stride=1, padding=0),
-                                    nn.Conv2d(64, 32, kernel_size=1, stride=1, padding=0),
-                                    nn.BatchNorm2d(32),
-                                    nn.ReLU(inplace=True),
-                                    nn.Dropout2d(p=0.2),
-                                    nn.Conv2d(32, classes, kernel_size=1, stride=1, padding=0))
-
-    def forward(self, x, y=None):
-        x1 = self.header(x)  # x 1, 32
-        lbm1 = self.lbm4(x1)
-        x1_lbm1 = x1 * lbm1
-
-        x2 = self.stage1(x1_lbm1)  # x 1/4, 64
-        lbm2 = self.lbm3(x2)
-        x2_lbm2 = x2 * lbm2
-
-        x4 = self.stage2(x2_lbm2)  # x 1/4, 256
-        lbm4 = self.lbm2(x4)
-        x4_lbm4 = x4 * lbm4
-
-        x8 = self.stage3(x4_lbm4)  # x 1/8, 512
-        lbm8 = self.lbm1(x8)
-        x8_lbm8 = x8 * lbm8
-
-        x16 = self.stage4(x8_lbm8) # x 1/16, 1024
-        lbm16 = self.lbm0(x16)
-        x16_lbm16 = x16 * lbm16
-
-        x32 = self.stage5(x16_lbm16) # x 1/32, 2048
-        lbm32 = self.lbm(x32)
-        x32_lbm32 = x32 * lbm32
-
-        cv2.imshow("lbm32",
-                   (255.0 * lbm32.detach().cpu().numpy()[0].transpose(1, 2, 0).reshape(2, 16, 1).astype(np.uint8)))
-
-        cv2.imshow("lbm16",
-                   (255.0 * lbm16.detach().cpu().numpy()[0].transpose(1, 2, 0).reshape(4, 32, 1).astype(np.uint8)))
-
-        cv2.imshow("lbm8",
-                   (255.0 * lbm8.detach().cpu().numpy()[0].transpose(1, 2, 0).reshape(8, 64, 1).astype(np.uint8)))
-
-        cv2.imshow("lbm4",
-                   (255.0 * lbm4.detach().cpu().numpy()[0].transpose(1, 2, 0).reshape(16, 128, 1).astype(np.uint8)))
-
-        cv2.imshow("lbm2",
-                   (255.0 * lbm2.detach().cpu().numpy()[0].transpose(1, 2, 0).reshape(16, 128, 1).astype(np.uint8)))
-
-        cv2.imshow("lbm1",
-                   (255.0 * lbm1.detach().cpu().numpy()[0].transpose(1, 2, 0).reshape(64, 512, 1).astype(np.uint8)))
-
-        x32 = self.conv_32(x32_lbm32)
-
-        x16 = torch.cat([x16_lbm16, x32], dim=1)
-        x16 = self.conv_16(x16)
-
-        x8 = torch.cat([x8_lbm8, x16], dim=1)
-        x8 = self.conv_8(x8)
-
-        x4 = torch.cat([x4_lbm4, x8], dim=1)
-        x4 = self.conv_4(x4)
-
-        x2 = torch.cat([x2_lbm2, x4], dim=1)
-        x2 = self.conv_2(x2)
-
-        x1 = torch.cat([x1_lbm1, x2], dim=1)
-        x_output = self.output(x1)
-
-        x_output = torch.sigmoid(x_output)
-        cv2.imshow("ResNeSt X", (255.0 * x_output.detach().cpu().numpy()[0].transpose(1, 2, 0)).astype(np.uint8))
-
-        if self.training:
-            # Drwaing
-            cv2.waitKey(30)
-
-            # x_output = x_output[:, :2]
-            # y = y[:, :2]
             loss = self.criterion(x_output, y)
 
             return x_output, loss
