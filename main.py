@@ -37,10 +37,10 @@ np.random.seed(1377)
 random.seed(1377)
 
 def main():
-    dataset = Train_DataSet("../pytorch-3d-semseg/data_road")
+    dataset = Train_DataSet("../path/to/kitti/data_road")
     dataset_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, drop_last=True, num_workers=0)
 
-    dataset_test = Test_DataSet("../pytorch-3d-semseg/data_road")
+    dataset_test = Test_DataSet("../path/to/kitti/data_road")
     dataset_loader_test = DataLoader(dataset_test, batch_size=1, shuffle=False, drop_last=True, num_workers=0)
 
     model = LBMNet50().to(device)
