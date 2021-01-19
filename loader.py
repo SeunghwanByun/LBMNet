@@ -155,9 +155,8 @@ class Train_DataSet(Dataset):
         theta_[theta_ < 0] = 0
         theta_[theta_ >= 64] = 63
 
-        fusion_map = np.zeros((self.proj_H, self.proj_W, self.proj_C))
-        # fusion_map = np.zeros((self.proj_H, self.proj_W, 9))
-
+        fusion_map = np.zeros((self.proj_H, self.proj_W, self.proj_C)
+                              
         scan_z = 255.0 * (scan_z - scan_z.min()) / (scan_z.max() - scan_z.min())
         # intensity = 255.0 * (intensity - intensity.min()) / (intensity.max() - intensity.min())
         # depth_ = 255.0 * (depth_ - depth_.min()) / (depth_.max() - depth_.min())
@@ -183,33 +182,19 @@ class Train_DataSet(Dataset):
 
         # Step 1 Color Augmentation
         selection_num = random.randint(0, 7)
-        # cv2.imshow("Original", fusion_map[:,:,:3].astype(np.uint8))
         # for selection_num in range(0, 7):
         if selection_num == 0:
             fusion_map[:,:,:3] = White_Noise(fusion_map[:,:,:3].astype(np.uint8))
-            # white = White_Noise(fusion_map[:, :, :3].astype(np.uint8))
-            # cv2.imshow("white", white.astype(np.uint8))
         elif selection_num == 1:
             fusion_map[:,:,:3] = Gray(fusion_map[:,:,:3].astype(np.uint8))
-            # gray = Gray(fusion_map[:,:,:3].astype(np.uint8))
-            # cv2.imshow("gray", gray.astype(np.uint8))
         elif selection_num == 2:
             fusion_map[:,:,:3] = add_light(fusion_map[:,:,:3].astype(np.uint8))
-            # light = add_light(fusion_map[:, :, :3].astype(np.uint8))
-            # cv2.imshow("add_light", light.astype(np.uint8))
         elif selection_num == 3:
             fusion_map[:,:,:3] = contrast_image(fusion_map[:,:,:3].astype(np.uint8))
-            # contrast = contrast_image(fusion_map[:, :, :3].astype(np.uint8))
-            # cv2.imshow("contrast", contrast.astype(np.uint8))
         elif selection_num == 4:
             fusion_map[:,:,:3] = saturation_image(fusion_map[:,:,:3].astype(np.uint8))
-            # saturation = saturation_image(fusion_map[:,:,:3].astype(np.uint8))
-            # cv2.imshow("saturation", saturation.astype(np.uint8))
         elif selection_num == 5:
             fusion_map[:,:,:3] = Equalization(fusion_map[:,:,:3].astype(np.uint8))
-            # equalization = Equalization(fusion_map[:, :, :3].astype(np.uint8))
-            # cv2.imshow("equalization", equalization.astype(np.uint8))
-            # cv2.waitKey(0)
 
         fusion_map[:, :, 0] = 1.0 * (fusion_map[:, :, 0] - fusion_map[:, :, 0].min()) / (
                     fusion_map[:, :, 0].max() - fusion_map[:, :, 0].min())
@@ -218,21 +203,7 @@ class Train_DataSet(Dataset):
         fusion_map[:, :, 2] = 1.0 * (fusion_map[:, :, 2] - fusion_map[:, :, 2].min()) / (
                     fusion_map[:, :, 2].max() - fusion_map[:, :, 2].min())
 
-        # re_img = (fusion_map[:,:,:3] * 255.0).astype(np.uint8)
-        # re_img = cv2.resize(re_img, (512, 100))
-        # cv2.imshow("img", re_img)
-
-        # cv2.imshow("img", (255.0 * fusion_map[:,:,:3]).astype(np.uint8))
-        # cv2.imshow("z", (255.0 * fusion_map[:,:,5]).astype(np.uint8))
-        # cv2.imshow("intensity", (255.0 * fusion_map[:,:,6]).astype(np.uint8))
-        # cv2.imshow("depth", (255.0 * fusion_map[:,:,7]).astype(np.uint8))
-        # cv2.imshow("x", (255.0 * fusion_map[:,:,3]).astype(np.uint8))
-        # cv2.imshow("y", (255.0 * fusion_map[:,:,4]).astype(np.uint8))
-        # cv2.waitKey(1000)
-
         fusion_map = (fusion_map - mean) / std
-
-        # depth_map_rgb = depth_map_rgb.astype(np.uint8)
 
         # Build a GT
         velodyne = self.gt_lidar_dir[item]
@@ -309,31 +280,6 @@ class Train_DataSet(Dataset):
         # Flip
         input_tensor, label_tensor = Flip(input_tensor, label_tensor, 0.5)
 
-        # label_tensor[:,:,2] = 1. - (label_tensor[:,:,0] + label_tensor[:,:,1])
-
-        # cv2.imshow("img", (input_tensor[:,:,:3]).astype(np.uint8))
-        # cv2.imshow("x", (input_tensor[:,:,3]).astype(np.uint8))
-        # cv2.imshow("y", (input_tensor[:,:,4]).astype(np.uint8))
-        # cv2.imshow("z", (input_tensor[:,:,5]).astype(np.uint8))
-        # cv2.imshow("intensity", (input_tensor[:, :, 6]).astype(np.uint8))
-        # cv2.imshow("depth", (input_tensor[:, :, 7]).astype(np.uint8))
-        # cv2.waitKey(1000)
-
-
-        # lbl = np.array(lbl, dtype=np.float32)
-        #
-        # # Normailize
-        #
-        # lbl = 2 * (lbl) / (255.0) -1
-        # # lbl = np.array(lbl, dtype=np.uint8)
-        #
-        # # Data Augmentation
-        #
-        # img = cv2.resize(img, self.img_size)
-        # lbl = cv2.resize(lbl, self.img_size)
-        #
-        # img = img.reshape(self.img_size[1], self.img_size[0], 1)
-        # lbl = lbl.reshape(self.img_size[1], self.img_size[0], 1)
 
         # NHWC -> NCHW
         input_tensor = input_tensor.transpose(2, 0, 1)
@@ -672,12 +618,6 @@ class Test_DataSet(Dataset):
         fusion_map[theta_, phi_, 3] = scan_z
         fusion_map[theta_, phi_, 4] = intensity
         fusion_map[theta_, phi_, 5] = depth_
-        # fusion_map[theta_, phi_, 6] = intensity
-        # fusion_map[theta_, phi_, 7] = depth_
-
-        # re_img = (fusion_map[:, :, :3] * 255.0).astype(np.uint8)
-        # re_img = cv2.resize(re_img, (512, 100))
-        # cv2.imshow("img", re_img)
 
         fusion_map = (fusion_map - mean) / std
 
