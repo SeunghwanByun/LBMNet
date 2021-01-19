@@ -19,8 +19,8 @@ vis.close(env="main")
 
 torch.cuda.empty_cache()
 
-from loader6 import Train_DataSet, Test_DataSet
-from LBM5 import LBMNet50_Test53 as LBMNet50
+from loader import Train_DataSet, Test_DataSet
+from LBM import LBMNet50_Improv as LBMNet50
 from utils import acc_check, value_tracker
 
 batch_size = 4
@@ -55,6 +55,8 @@ def main():
     scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=100, T_mult=2)
 
     iters = len(dataset_loader)
+    
+    # 부득이하게 학습을 중간에 멈추고 다시 돌려야한다면, 학습을 멈췄을 당시의 epoch의 Learning Rate로 설정하기 위한 반복문
     # for epoch in range(1400):
     #     for i, data in enumerate(dataset_loader, 0):
     #         scheduler.step(epoch + i / iters)
@@ -94,11 +96,9 @@ def main():
 
         # Check Accuracy
         if epoch == 0 or epoch % 100 == 99:
-            # save_path = "./Result/output_valid54/"
-            save_test_path = "./Result/output_test54_batch_size_4/"
-            # acc_check(model, device, dataset_valid, dataset_loader_valid, epoch, save_path)
+            save_test_path = "./Result/output/path"
             acc_check(model, device, dataset_test, dataset_loader_test, epoch, save_test_path)
-            torch.save(model.state_dict(), "./Result/model54_batch_size_4/model_epoch_{}.pth".format(epoch + 1))
+            torch.save(model.state_dict(), "./Result/model/output/path/model_epoch_{}.pth".format(epoch + 1))
 
         start = time.time()
     print("Finished Training...!")
