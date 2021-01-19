@@ -35,46 +35,9 @@ def acc_check(net, device, test_set, test_set_loader, epoch, save_path):
             print("Process Time in a Validation Image {}".format(process_time))
             total_time += process_time
 
-            # outputs = decode_segmap(outputs[0])
             outputs = (outputs[0].detach().cpu().numpy().transpose(1, 2, 0) * 255.0).astype(np.uint8)
 
-            # name = test_set.color_lidar_dir[i]
-
-            # cv2.imshow("outputs[0]", outputs[:,:,0].astype(np.uint8))
-            # cv2.imshow("outputs[1]", outputs[:, :, 1].astype(np.uint8))
-            # cv2.imshow("outputs[2]", outputs[:, :, 2].astype(np.uint8))
-            # cv2.waitKey(0)
-
-            # if name[0].split("\\")[-1].split(".")[0] == 'umm_000013':
-            #     c0 = outputs[:, :, 0]
-            #     c1 = outputs[:, :, 1]
-            #     c2 = outputs[:, :, 2]
-            #
-            #     c0 = (255.0 * (c0 - c0.min()) / (c0.max() - c0.min())).astype('uint8')
-            #     c1 = (255.0 * (c1 - c1.min()) / (c1.max() - c1.min())).astype('uint8')
-            #     c2 = (255.0 * (c2 - c2.min()) / (c2.max() - c2.min())).astype('uint8')
-            #
-            #     cv2.imshow("outputs[0]", c0)
-            #     cv2.imshow("outputs[1]", c1)
-            #     cv2.imshow("outputs[2]", c2)
-            #     cv2.waitKey(0)
-            #     a = 0
-
-            # c0 = outputs[:, :, 0]
-            # c1 = outputs[:, :, 1]
-            # c2 = outputs[:, :, 2]
-            #
-            # c0 = (255.0 * (c0 - c0.min()) / (c0.max() - c0.min())).astype('uint8')
-            # c1 = (255.0 * (c1 - c1.min()) / (c1.max() - c1.min())).astype('uint8')
-            # c2 = (255.0 * (c2 - c2.min()) / (c2.max() - c2.min())).astype('uint8')
-            #
-            # cv2.imshow("outputs[0]", c0)
-            # cv2.imshow("outputs[1]", c1)
-            # cv2.imshow("outputs[2]", c2)
-            # cv2.waitKey(0)
-
             save_name = save_path + "{0}_{1}.png".format(epoch, name[0].split("\\")[-1].split(".")[0])
-            # save_name = save_path + "{0}_{1}.png".format(epoch, name[0].split("/")[-1].split(".")[0])
             cv2.imwrite(save_name, outputs.astype(np.uint8))
 
         print("Average time of total process {}".format(total_time / test_set_loader.__len__()))
@@ -119,8 +82,6 @@ def inference_check(net, device, raw_data_loader, save_path=None):
             total_time += process_time
 
             outputs = (outputs[0].detach().cpu().numpy().transpose(1, 2, 0) * 255.0).astype(np.uint8)
-            # cv2.imshow("imge", outputs)
-            # cv2.waitKey(30)
             theta_ = theta_.detach().cpu().numpy()
             phi_ = phi_.detach().cpu().numpy()
             scan_x = scan_x.detach().cpu().numpy()
@@ -134,11 +95,6 @@ def inference_check(net, device, raw_data_loader, save_path=None):
             road_velodyne[road_velodyne >= 200] = 255
             road_velodyne[road_velodyne < 200] = 0
             non_road_velodyne = 255 - road_velodyne
-
-            # print("road_velodyne.shape", road_velodyne.shape)
-            # print("scan_x.shape", scan_x.shape)
-            # print("scan_y.shape", scan_y.shape)
-            # print("scan_z.shape", scan_z.shape)
 
             norm_non_road_velodyne = (non_road_velodyne - non_road_velodyne.min()) / (non_road_velodyne.max() - non_road_velodyne.min())
 
@@ -155,18 +111,6 @@ def inference_check(net, device, raw_data_loader, save_path=None):
 
                 save_result_velodyne_file.close()
 
-            # b = (b - b.min()) / (b.max() - b.min())
-            # g = (g - g.min()) / (g.max() - g.min())
-            # r = (r - r.min()) / (r.max() - r.min())
-            #
-            # reconstructed_velodyne_points = np.vstack((scan_x, scan_y, scan_z, r, g, b)).T
-            #
-            # pcd = open3d.geometry.PointCloud()
-            # pcd.points = open3d.utility.Vector3dVector(reconstructed_velodyne_points[:,:3])
-            # pcd.colors = open3d.utility.Vector3dVector(reconstructed_velodyne_points[:,3:])
-            # open3d.visualization.draw_geometries([pcd])
-
-            # new_img = np.zeros((384, 1242, 3), dtype=np.int32)
             new_img = np.ones((384, 1242, 3), dtype=np.int32)
             # new_img *= 48
             new_img[v, u, 0] = b
@@ -175,14 +119,9 @@ def inference_check(net, device, raw_data_loader, save_path=None):
 
             kernel = np.ones((3, 3), np.uint8)
             result = cv2.dilate(new_img.astype(np.uint8), kernel, iterations=1)
-            # cv2.imshow("new_img", result.astype(np.uint8))
 
-            # save_name = save_path + "{}.png".format(name[0].split("\\")[-1].split(".")[0])
             save_name_new_img = save_path + "new_img_{}.png".format(name[0].split("\\")[-1].split(".")[0])
 
-            # cv2.imshow("output", outputs.astype(np.uint8))
-            # cv2.waitKey(30)
-            # cv2.imwrite(save_name, outputs.astype(np.uint8))
             cv2.imwrite(save_name_new_img, new_img.astype(np.uint8))
 
         print("Average time of total process {}".format(total_time / raw_data_loader.__len__()))
