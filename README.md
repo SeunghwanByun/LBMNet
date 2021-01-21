@@ -1,19 +1,6 @@
 # LBMNet
 A Road Area Detection Using Local Boundary Mask-based Deep Neural Network
 
-```
-Requirement
-
-pip 20.0.2
-tqdm 4.46.0
-numpy 1.18.1
-pytorch 1.5.0
-torchvision 0.6.0
-python 3.6.10
-cudatoolkit 10.1.243
-opencv-python 4.2.0.34
-```
-
 ### Abstract
 본 논문은 카메라와 LiDAR를 카메라 평면에 투영함으로서 생기는 단점을 보완하기 위해서 카메라와 LiDAR의 센서 융합을 통해 LiDAR에 색상 정보를 추가하고 구면좌표계에 투영함으로서 LiDAR의 희소성 문제를 해결한다. 또한 도로 영역 검출의 정밀도를 높이기 위해 네트워크의 특징맵이 도로 영역 경계를 확실하게 구분하도록 학습하는 지역 경계 마스크 모듈을 제안한다. 이를 통해 실시간 도로 영역 검출 알고리즘을 제안한다.
 
