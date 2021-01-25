@@ -1,3 +1,7 @@
+##############################################################
+# Inference for road detection in kitti raw data(road scene) #
+##############################################################
+
 import os
 import random
 import numpy as np
