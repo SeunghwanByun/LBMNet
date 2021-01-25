@@ -15,19 +15,19 @@ LBMNet
  |---- main.py
  |---- models
  |    |---- model_epoch_xxxx.pth
- |    |---- data_road
- |         |---- training
- |              |---- image_2
- |              |---- calib
- |              |---- gt_txt
- |         |---- testing
- |              |---- image_2
- |              |---- calib
- |    |---- data_road_velodyne
- |         |---- training
- |              |---- velodyne
- |         |---- testing
- |              |---- velodyne
+ |---- data_road
+ |    |---- training
+ |         |---- image_2
+ |         |---- calib
+ |         |---- gt_txt
+ |    |---- testing
+ |         |---- image_2
+ |         |---- calib
+ |---- data_road_velodyne
+ |    |---- training
+ |         |---- velodyne
+ |    |---- testing
+ |         |---- velodyne
 ```
 
 ### Usage
