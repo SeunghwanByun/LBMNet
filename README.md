@@ -9,6 +9,38 @@ A Road Area Detection Using Local Boundary Mask-based Deep Neural Network
   <img src=https://user-images.githubusercontent.com/49049277/105051607-45ffc280-5ab2-11eb-9998-0b17936806c0.png width=100%>
 </p>
 
+### Setup
+```
+LBMNet
+ |---- main.py
+ |---- models
+ |    |---- model_epoch_xxxx.pth
+ |    |---- data_road
+ |         |---- training
+ |              |---- image_2
+ |              |---- calib
+ |              |---- gt_txt
+ |         |---- testing
+ |              |---- image_2
+ |              |---- calib
+ |    |---- data_road_velodyne
+ |         |---- training
+ |              |---- velodyne
+ |         |---- testing
+ |              |---- velodyne
+```
+
+### Usage
+For training
+```
+python main.py
+```
+
+For inference
+```
+python inference_raw_data.py
+```
+
 ### Result
 #### Comparison with state-of-the-art
 <img src=https://user-images.githubusercontent.com/49049277/105048920-75f99680-5aaf-11eb-8ec3-432822e0930a.png width="60%">
