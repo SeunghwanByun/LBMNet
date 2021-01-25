@@ -1,3 +1,6 @@
+####################################
+# Train LBMNet using kitti dataset #
+####################################
 import os
 import cv2
 import time
