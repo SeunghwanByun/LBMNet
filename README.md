@@ -1,8 +1,14 @@
-# LBMNet
+# LBMNet - A Study on Road Area Detection Using Local Boundary Mask-based Deep Neural Network
 A Road Area Detection Using Local Boundary Mask-based Deep Neural Network
 
+Created by Seunghwan Byun from Soongsil University.
+
+#### Introduction
+
+This repository is code release for my graduate paper (paper report [here](http://oasis.dcollection.net/public_resource/pdf/200000361396_20220225135302.pdf)).
+
 ### Abstract
-본 논문은 카메라와 LiDAR를 카메라 평면에 투영함으로서 생기는 단점을 보완하기 위해서 카메라와 LiDAR의 센서 융합을 통해 LiDAR에 색상 정보를 추가하고 구면좌표계에 투영함으로서 LiDAR의 희소성 문제를 해결한다. 또한 도로 영역 검출의 정밀도를 높이기 위해 네트워크의 특징맵이 도로 영역 경계를 확실하게 구분하도록 학습하는 지역 경계 마스크 모듈을 제안한다. 이를 통해 실시간 도로 영역 검출 알고리즘을 제안한다.
+This paper solves the sparseness problem of LiDAR by adding color information to the LiDAR through sensor fusion of the camera and LiDAR and projecting it to the spherical coordinate system to compensate for the shortcomings caused by projecting the camera and LiDAR onto the camera plane. In addition, to increase the precision of road area detection, we propose a regional boundary mask module that trains the network feature map to reliably distinguish road area boundaries. Through this, a real-time road area detection algorithm is proposed.
 
 ### Network Architecture
 <p align="center">
