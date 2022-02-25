@@ -5,7 +5,7 @@ Created by Seunghwan Byun from Soongsil University.
 
 #### Introduction
 
-This repository is code release for my graduate paper (paper report [here](http://oasis.dcollection.net/public_resource/pdf/200000361396_20220225135302.pdf)).
+This repository is code release for my graduate paper
 
 ### Abstract
 This paper solves the sparseness problem of LiDAR by adding color information to the LiDAR through sensor fusion of the camera and LiDAR and projecting it to the spherical coordinate system to compensate for the shortcomings caused by projecting the camera and LiDAR onto the camera plane. In addition, to increase the precision of road area detection, we propose a regional boundary mask module that trains the network feature map to reliably distinguish road area boundaries. Through this, a real-time road area detection algorithm is proposed.
